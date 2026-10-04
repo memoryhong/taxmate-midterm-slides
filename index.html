@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="ko" class="nojs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TaxMate 중간 발표</title>
+<meta name="description" content="카카오테크캠퍼스 4기 부산대 4팀 — 자영업자 카드 지출 비용처리 판정 서비스 중간 발표">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f6f3ec; --paper-2:#ece7dc; --ink:#1b2333; --ink-2:#4a5466; --ink-3:#8a8f99;
+  --rule:#d6cfbf; --navy:#22355c;
+  --ok:#2f7a4f; --ok-bg:#e1efe5;
+  --no:#b23a2e; --no-bg:#f5dfdb;
+  --ask:#b7791f; --ask-bg:#f6ead2;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+  --sans:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#d9d3c6;color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{position:relative;flex:none;width:1280px;height:720px;transform-origin:center center}
+html.nojs,html.nojs body{overflow:auto}
+html.nojs #viewport{position:static;display:block;padding:24px}
+html.nojs #deck{height:auto;margin:0 auto}
+html.nojs .slide{display:flex;position:relative;height:720px;margin-bottom:24px}
+html.nojs #hud,html.nojs #progress{display:none}
+.slide{position:absolute;inset:0;background:var(--paper);padding:64px 80px 56px;display:none;flex-direction:column;
+  box-shadow:0 20px 60px rgba(27,35,51,.18);overflow:hidden}
+.slide.active{display:flex}
+.slide::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;background:var(--navy)}
+.kicker{font-family:var(--mono);font-size:14px;letter-spacing:.08em;color:var(--ink-3);text-transform:uppercase;margin-bottom:14px}
+h1{font-size:64px;line-height:1.15;font-weight:800;letter-spacing:-.02em}
+h2{font-size:40px;line-height:1.25;font-weight:750;letter-spacing:-.015em;margin-bottom:28px}
+h3{font-size:21px;font-weight:700;margin-bottom:8px}
+p,li{font-size:20px;line-height:1.6;color:var(--ink-2)}
+b,strong{color:var(--ink);font-weight:700}
+code,.mono{font-family:var(--mono);font-size:.88em}
+ul.clean{list-style:none}
+ul.clean li{padding-left:22px;position:relative;margin-bottom:10px}
+ul.clean li::before{content:"";position:absolute;left:0;top:.68em;width:8px;height:8px;background:var(--navy)}
+.foot{position:absolute;left:80px;right:80px;bottom:26px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.grid{display:grid;gap:22px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:#fffdf8;border:1px solid var(--rule);padding:22px 24px}
+.card p,.card li{font-size:17px}
+.stamp{display:inline-block;font-weight:800;font-size:15px;padding:3px 10px;border:2px solid currentColor;letter-spacing:.04em;transform:rotate(-2deg)}
+.s-ok{color:var(--ok);background:var(--ok-bg)} .s-no{color:var(--no);background:var(--no-bg)} .s-ask{color:var(--ask);background:var(--ask-bg)}
+.big{font-size:76px;font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--navy)}
+.big small{font-size:28px;font-weight:700;color:var(--ink-3);margin-left:4px}
+.label{font-size:15px;color:var(--ink-3);margin-top:8px;line-height:1.45}
+.muted{color:var(--ink-3)}
+.spacer{flex:1}
+table{border-collapse:collapse;width:100%}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);font-size:17px;vertical-align:top}
+th{font-size:13px;font-family:var(--mono);letter-spacing:.06em;color:var(--ink-3);font-weight:600;text-transform:uppercase}
+td.num{font-family:var(--mono);text-align:right}
+/* title slide */
+.title-slide{background:var(--ink);color:#f6f3ec}
+.title-slide::before{background:var(--no)}
+.title-slide h1{color:#fff}
+.title-slide p{color:#c9ccd3}
+.title-slide .kicker{color:#8a93a6}
+.receipt{position:absolute;right:80px;top:96px;width:330px;background:var(--paper);color:var(--ink);padding:22px 24px 28px;font-family:var(--mono);font-size:14px;transform:rotate(2.5deg);box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.receipt .row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--rule);align-items:center;gap:10px}
+.receipt .row span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.receipt .stamp{font-size:12px;padding:1px 6px;font-family:var(--sans);flex:none}
+.receipt .hd{font-weight:600;margin-bottom:8px;font-size:13px;color:var(--ink-3)}
+/* flow */
+.flow{display:flex;align-items:stretch;gap:0}
+.flow .node{flex:1;background:#fffdf8;border:1px solid var(--rule);padding:16px 14px;position:relative}
+.flow .node h3{font-size:17px}
+.flow .node p{font-size:14.5px;line-height:1.5}
+.flow .arrow{width:28px;display:flex;align-items:center;justify-content:center;color:var(--ink-3);font-size:20px;flex:none}
+.tag{display:inline-block;font-family:var(--mono);font-size:11.5px;padding:2px 7px;background:var(--paper-2);color:var(--ink-2);margin-bottom:8px;letter-spacing:.04em}
+.tag.llm{background:#e4e8f3;color:var(--navy)}
+.tag.human{background:var(--ask-bg);color:var(--ask)}
+/* architecture */
+.arch{display:grid;grid-template-columns:1fr 1.35fr 1fr;gap:26px;align-items:stretch}
+.box{border:2px solid var(--ink);background:#fffdf8;padding:18px 20px}
+.box.soft{border:1px solid var(--rule)}
+.box h3{display:flex;justify-content:space-between;align-items:baseline}
+.box h3 span{font-family:var(--mono);font-size:12px;color:var(--ink-3);font-weight:400}
+.box ul{list-style:none;margin-top:8px}
+.box li{font-size:15.5px;line-height:1.5;padding:5px 0;border-top:1px dotted var(--rule)}
+.box li:first-child{border-top:none}
+.wire{font-family:var(--mono);font-size:12.5px;color:var(--ink-3);margin-top:12px;line-height:1.6}
+/* gates */
+.gates{display:flex;flex-direction:column;gap:8px}
+.gate{display:grid;grid-template-columns:70px 1fr 190px;align-items:center;gap:16px;background:#fffdf8;border:1px solid var(--rule);padding:10px 16px}
+.gate .id{font-family:var(--mono);font-weight:600;font-size:18px;color:var(--navy)}
+.gate .t{font-size:17px;color:var(--ink)}
+.gate .t span{color:var(--ink-3);font-size:15px;margin-left:6px}
+.gate .k{font-size:14px;text-align:right}
+.gate.block{border-left:5px solid var(--no)}
+.gate.attr{border-left:5px solid var(--ask)}
+/* bars */
+.bars{display:flex;align-items:flex-end;gap:26px;height:260px;border-bottom:2px solid var(--ink);padding:0 10px}
+.bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%}
+.bar .stack{width:100%;display:flex;flex-direction:column-reverse}
+.bar .seg{width:100%}
+.bar .v{font-family:var(--mono);font-size:14px;margin-bottom:6px;color:var(--ink)}
+.xl{display:flex;gap:26px;padding:8px 10px 0}
+.xl div{flex:1;text-align:center;font-size:14px;color:var(--ink-2);line-height:1.35}
+.legend{display:flex;gap:18px;font-size:14px;color:var(--ink-2);margin-top:14px}
+.legend i{display:inline-block;width:12px;height:12px;margin-right:6px;vertical-align:-1px}
+/* timeline */
+.tl{position:relative;margin-top:30px}
+.tl .line{position:absolute;left:0;right:0;top:15px;height:2px;background:var(--ink)}
+.tl .items{display:grid;grid-template-columns:repeat(8,1fr);gap:10px;position:relative}
+.tl .it .dot{width:14px;height:14px;border-radius:50%;background:var(--ink);margin:8px 0 14px}
+.tl .it.now .dot{background:var(--no);box-shadow:0 0 0 6px rgba(178,58,46,.18)}
+.tl .it.future .dot{background:var(--paper);border:2px solid var(--ink)}
+.tl .d{font-family:var(--mono);font-size:13px;color:var(--ink-3)}
+.tl .e{font-size:15px;line-height:1.45;color:var(--ink);margin-top:4px}
+.tl .it.future .e{color:var(--ink-3)}
+/* ui */
+#hud{position:fixed;bottom:14px;right:18px;font-family:var(--mono);font-size:12px;color:#6c6657;display:flex;gap:10px;align-items:center;z-index:5}
+#hud button{background:rgba(255,255,255,.6);border:1px solid #bdb5a3;width:30px;height:30px;cursor:pointer;font-size:14px;color:#3d3a33}
+#hud button:hover{background:#fff}
+#progress{position:fixed;left:0;top:0;height:3px;background:var(--no);z-index:5;transition:width .25s}
+.hint{font-family:var(--mono);font-size:12px;color:#8a93a6;position:absolute;left:80px;bottom:26px}
+@media screen{.foot span:last-child{visibility:hidden}}
+@media print{
+  @page{size:1280px 720px;margin:0}
+  html,body{overflow:visible;background:none}
+  #viewport{position:static;display:block}
+  #deck{transform:none!important;width:1280px;height:auto}
+  .slide{display:flex!important;position:relative;width:1280px;height:720px;page-break-after:always;box-shadow:none}
+  #hud,#progress{display:none}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="viewport"><div id="deck">
+<!-- 1 -->
+<section class="slide title-slide">
+  <div class="kicker">KakaoTech Campus 4기 · 부산대 4팀 · 중간 발표</div>
+  <div class="spacer" style="flex:.6"></div>
+  <h1>지금까지 한 일,<br>앞으로 할 일</h1>
+  <p style="font-size:24px;margin-top:22px;max-width:640px">카드 승인내역을 올리면 건마다 <b style="color:#fff">가능 · 불가 · 확인 필요</b>를 근거 조문과 함께 알려주는 1인 사업자용 비용처리 판정 서비스</p>
+  <div class="spacer"></div>
+  <p style="font-size:16px">PM 정현빈 · BE 최유렬 · 홍성진 · FE 이재성 · 이치오 · AI 강민규</p>
+  <p style="font-size:14px;color:#8a93a6;margin-top:4px">2026. 10</p>
+  <div class="hint">→ / Space 다음 · ← 이전 · F 전체화면</div>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <div class="kicker">01 · 지금까지 한 일 — 기획 · 설계 (8월 ~ 9월 초)</div>
+  <h2>무엇을, 어떤 원칙으로 만들지 정했습니다</h2>
+  <div class="grid g3" style="gap:20px">
+    <div class="card"><p class="mono muted" style="font-size:13px">08.21</p><h3 style="margin-top:6px">아이템 · 사용자 확정</h3><ul class="clean"><li>사회초년생 세금 → 자영업자 종소세 비용처리로 피벗</li><li>첫 페르소나: 직원 없는 1인 개발자</li><li>대표 판정 3가지 정의 (식대 · 노트북 · 해외 SaaS)</li></ul></div>
+    <div class="card"><p class="mono muted" style="font-size:13px">08.21 ~ 09.03</p><h3 style="margin-top:6px">설계 원칙</h3><ul class="clean"><li>판정 경로에 LLM 호출 0회</li><li>사실만 저장하고 판정은 매번 재계산</li><li>근거 조문 없으면 "확인 필요"</li><li>릴리즈 기준: 오탐 0 · 근거 100%</li></ul></div>
+    <div class="card"><p class="mono muted" style="font-size:13px">09.01 ~ 09.07</p><h3 style="margin-top:6px">구조 · 분담</h3><ul class="clean"><li>Spring 백엔드 / AI 서버 분리</li><li>ERD · API v1 확정</li><li>국가법령정보 API 승인</li><li>개발 파트 분배</li></ul></div>
+  </div>
+  <div class="foot"><span>TaxMate · 중간 발표</span><span>02</span></div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <div class="kicker">01 · 지금까지 한 일 — 개발 · 검증 (9월 ~ 현재)</div>
+  <h2>파이프라인을 만들고, 평가셋과 세무사로 검증했습니다</h2>
+  <div class="grid g2" style="gap:20px 28px">
+    <div class="card"><h3>전처리 · 분류</h3><ul class="clean"><li>상호 정규화 엔진 (지점 분리, PG · 플랫폼 차단, 회귀 테스트)</li><li>분류기 vs 임베딩 실험 → 멘토 제안으로 <b>상권정보 매칭 + 사용자 선택</b>으로 전환</li><li>해외 SaaS 사전 확보</li></ul></div>
+    <div class="card"><h3>판정 엔진 · 룰카드</h3><ul class="clean"><li>G1~G6 관문 엔진, 업종 프로파일 → 카드 생성기</li><li>룰카드 51개 · 평가 케이스 58건</li><li>치명 오류 <b>3 → 0</b>, 일치 <b>13 → 39</b></li></ul></div>
+    <div class="card"><h3>현장 검증</h3><ul class="clean"><li>09.18 세무사 대면 상담</li><li>→ 주말 · 공휴일 식대는 기본 불가, 소명하면 가능으로 룰 수정</li></ul></div>
+    <div class="card"><h3>서비스 · 협업</h3><ul class="clean"><li>09.25 1차 배포</li><li>업로드 · 거래 목록 · 분류 확인 · 판정 진행률 화면</li><li>API 계약 단일 원본, Swagger 골격 · 머지된 PR 69개</li></ul></div>
+  </div>
+  <div class="foot"><span>TaxMate · 중간 발표</span><span>03</span></div>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <div class="kicker">02 · 앞으로 할 일</div>
+  <h2>판정 결과를 화면까지 잇고, 평가로 다듬습니다</h2>
+  <div class="grid g3" style="gap:20px">
+    <div class="card" style="border-top:4px solid var(--no)"><p class="mono muted" style="font-size:13px">지금 ~ 10.09 · 개발 2차</p><h3 style="margin-top:6px">기능 연결</h3><ul class="clean"><li>업로드 → 정규화 · 분류 → 판정 → 화면 전 구간 연결</li><li>백엔드: 업로드, 거래, 분류 검토, 인증, 관리자 API</li><li>되묻기 답변 → 사실 저장 → 재판정</li></ul></div>
+    <div class="card"><p class="mono muted" style="font-size:13px">남은 과제</p><h3 style="margin-top:6px">정확도 · 데이터</h3><ul class="clean"><li>평가셋 미달 14건 해소</li><li>되묻기 질문 어휘 단일 원본으로 통일</li><li>해외 결제 통화 · 취소 상계 스키마 보강</li><li>공휴일 API, 카드사 실물 파일 검증</li></ul></div>
+    <div class="card"><p class="mono muted" style="font-size:13px">10.26 ~ 11.20</p><h3 style="margin-top:6px">마무리</h3><ul class="clean"><li>10.26 ~ 11.06 평가셋 확장 + QA</li><li>11.06 릴리즈</li><li>11.11 최종 제출</li><li>11.16 ~ 20 발표회</li></ul></div>
+  </div>
+  <p class="label" style="margin-top:18px">10.12 ~ 10.23은 브레이크(중간고사) 기간입니다.</p>
+  <div class="foot"><span>TaxMate · 중간 발표</span><span>04</span></div>
+</section>
+
+<!-- 5 -->
+<section class="slide title-slide">
+  <div class="kicker">Q &amp; A</div>
+  <div class="spacer"></div>
+  <h1>감사합니다</h1>
+  <div class="spacer"></div>
+  <p style="font-size:15px">카카오테크캠퍼스 4기 · 부산대 4팀</p>
+</section>
+
+</div></div>
+
+<div id="hud"><button id="prev" aria-label="이전">‹</button><span id="count">1 / 5</span><button id="next" aria-label="다음">›</button></div>
+
+<script>
+(function(){
+  document.documentElement.classList.remove('nojs');
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var deck=document.getElementById('deck'), count=document.getElementById('count'), bar=document.getElementById('progress');
+  var i=0;
+  function fit(){var s=Math.min(window.innerWidth/1280,window.innerHeight/720);deck.style.transform='scale('+s+')';}
+  function go(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach(function(s,k){s.classList.toggle('active',k===i)});
+    count.textContent=(i+1)+' / '+slides.length;
+    bar.style.width=((i+1)/slides.length*100)+'%';
+    if(location.hash!=='#'+(i+1)) history.replaceState(null,'','#'+(i+1));
+  }
+  document.addEventListener('keydown',function(e){
+    if(['ArrowRight','PageDown',' ','Enter'].indexOf(e.key)>=0){e.preventDefault();go(i+1)}
+    else if(['ArrowLeft','PageUp','Backspace'].indexOf(e.key)>=0){e.preventDefault();go(i-1)}
+    else if(e.key==='Home')go(0); else if(e.key==='End')go(slides.length-1);
+    else if(e.key==='f'||e.key==='F'){if(!document.fullscreenElement)document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();else document.exitFullscreen()}
+  });
+  document.getElementById('prev').onclick=function(){go(i-1)};
+  document.getElementById('next').onclick=function(){go(i+1)};
+  var tx=null;
+  document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+  document.addEventListener('touchend',function(e){if(tx===null)return;var dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>40)go(i+(dx<0?1:-1));tx=null});
+  window.addEventListener('resize',fit);
+  window.addEventListener('hashchange',function(){var n=parseInt(location.hash.slice(1),10);if(n)go(n-1)});
+  fit(); go((parseInt(location.hash.slice(1),10)||1)-1);
+})();
+</script>
+</body>
+</html>
