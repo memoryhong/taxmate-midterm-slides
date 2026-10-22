@@ -1,0 +1,759 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>경비판정 시연</title>
+<meta name="description" content="카드 결제 한 건이 경비가 되는지, 근거 조문과 함께 판정하는 1인 사업자용 서비스 경비판정의 시연 페이지">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FFFFFF;
+  --panel:#F2F3F5;
+  --ink:#000000;
+  --ink2:#3B4048;
+  --muted:#5D6670;
+  --line:#DADDE2;
+  --signal:#FFD43B;
+  --ok:#00703D;   --ok-bg:#E3F3EA;
+  --warn:#955A00; --warn-bg:#FBF0DC;
+  --deny:#C92A2A; --deny-bg:#FBE7E7;
+  --sans:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+  --serif:"Noto Serif KR","Nanum Myeongjo",serif;
+  --gutter:clamp(16px,4.3vw,62px);
+  --max:1316px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--paper);color:var(--ink2);font-family:var(--sans);font-size:17px;line-height:1.65;word-break:keep-all;-webkit-font-smoothing:antialiased}
+h1,h2,h3{color:var(--ink);margin:0;font-weight:400;letter-spacing:-0.02em}
+p{margin:0}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid #1F4FD8;outline-offset:3px;border-radius:6px}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--gutter)}
+.num{font-variant-numeric:tabular-nums}
+
+/* top bar */
+.bar{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:28px;height:64px}
+.brand{font-weight:700;color:var(--ink);text-decoration:none;font-size:19px;letter-spacing:-0.02em;display:flex;align-items:center;gap:10px}
+.brand i{width:14px;height:22px;background:var(--signal);border:2px solid var(--ink);border-radius:3px;display:inline-block}
+.bar nav{display:flex;gap:22px;margin-left:auto}
+.bar nav a{text-decoration:none;color:var(--muted);font-size:15px}
+.bar nav a[aria-current="true"]{color:var(--ink);font-weight:600}
+.pill{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 20px;border-radius:999px;background:var(--ink);color:#fff;text-decoration:none;font-size:15px;font-weight:600;border:0;cursor:pointer;white-space:nowrap}
+.pill[aria-disabled="true"]{background:var(--panel);color:var(--muted);cursor:not-allowed}
+.pill.light{background:var(--paper);color:var(--ink);border:1.5px solid var(--ink)}
+
+section{padding:112px 0}
+.sec-head{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;margin-bottom:56px;max-width:860px}
+.sec-head h2{font-size:clamp(32px,4.4vw,48px);line-height:1.3}
+.sec-head p{font-size:18px;color:var(--ink2);max-width:62ch}
+.part{color:var(--muted);font-size:15px;font-weight:600}
+
+/* hero */
+.hero{padding:72px 0 96px}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:56px;align-items:center}
+.hero h1{font-size:clamp(40px,6.4vw,84px);line-height:1.18;letter-spacing:-0.035em}
+.hero .lead{font-size:clamp(18px,1.6vw,21px);margin-top:28px;max-width:30em;color:var(--ink2)}
+.hero .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:40px}
+.hint{margin-top:28px;font-size:14px;color:var(--muted)}
+kbd{font-family:var(--sans);font-size:13px;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 7px;background:#fff;color:var(--ink2)}
+.stage{background:var(--signal);border-radius:28px;padding:44px 32px 56px;display:flex;justify-content:center;position:relative;min-height:520px}
+
+/* receipt: the one loud thing */
+.receipt{position:relative;width:min(340px,100%);background:#fff;color:var(--ink);padding:26px 26px 34px;
+  box-shadow:0 1px 0 rgba(0,0,0,.06);font-size:15px;line-height:1.5;
+  --tooth:9px;
+  -webkit-mask:radial-gradient(var(--tooth) at 50% 100%,#0000 98%,#000) 50% 100%/calc(2*var(--tooth)) 51% repeat-x, linear-gradient(#000 0 0) top/100% calc(100% - var(--tooth)) no-repeat;
+          mask:radial-gradient(var(--tooth) at 50% 100%,#0000 98%,#000) 50% 100%/calc(2*var(--tooth)) 51% repeat-x, linear-gradient(#000 0 0) top/100% calc(100% - var(--tooth)) no-repeat}
+.receipt .shop{font-weight:700;font-size:17px;text-align:center}
+.receipt .meta{color:var(--muted);text-align:center;font-size:13px;margin-top:2px}
+.receipt hr{border:0;border-top:1.5px dashed #9AA0A8;margin:16px 0}
+.receipt .row{display:flex;justify-content:space-between;gap:12px}
+.receipt .total{font-size:22px;font-weight:700;margin-top:6px}
+.hero .receipt .lines{min-height:120px}
+.stamp{position:absolute;right:14px;bottom:42px;transform:rotate(-9deg);border:3px solid currentColor;border-radius:12px;padding:8px 14px 9px;
+  background:rgba(255,255,255,.88);text-align:center;line-height:1.25;color:var(--ok)}
+.stamp b{display:block;font-size:30px;font-weight:800;letter-spacing:.04em}
+.stamp small{display:block;font-family:var(--serif);font-size:13px;font-weight:600}
+.stamp.deny{color:var(--deny)} .stamp.warn{color:var(--warn)}
+@media (prefers-reduced-motion:no-preference){
+  .hero .receipt{animation:print 1.1s cubic-bezier(.3,.7,.2,1) .2s both}
+  .hero .stamp{animation:stamp .35s cubic-bezier(.2,1.4,.4,1) 1.5s both}
+  @keyframes print{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
+  @keyframes stamp{from{opacity:0;transform:rotate(-9deg) scale(1.7)}to{opacity:1;transform:rotate(-9deg) scale(1)}}
+}
+
+/* problem */
+.problem{background:var(--panel)}
+.contrast{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.case{background:#fff;border-radius:22px;padding:28px}
+.case h3{font-size:22px;font-weight:600;margin-bottom:6px}
+.case .who{color:var(--muted);font-size:15px;margin-bottom:18px}
+.case ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.case li{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:10px}
+.tag{display:inline-block;font-size:13px;font-weight:700;padding:2px 10px;border-radius:999px;white-space:nowrap}
+.tag.ok{color:var(--ok);background:var(--ok-bg)} .tag.deny{color:var(--deny);background:var(--deny-bg)} .tag.warn{color:var(--warn);background:var(--warn-bg)}
+.persona{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:16px}
+.persona .box{background:#fff;border-radius:22px;padding:28px}
+.persona h3{font-size:20px;font-weight:600;margin-bottom:12px}
+.persona ul{margin:0;padding-left:1.1em;display:grid;gap:6px}
+.quote{font-size:clamp(22px,2.4vw,30px);line-height:1.5;color:var(--ink);margin-top:56px;max-width:36em}
+
+/* demo */
+.demo-grid{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:28px;align-items:start}
+.pick{background:var(--signal);border-radius:24px;padding:24px 22px 30px}
+.pick .receipt{width:100%;padding:18px 18px 26px}
+.pick .receipt .shop{font-size:15px}
+.txs{list-style:none;margin:0;padding:0}
+.txs button{all:unset;box-sizing:border-box;display:flex;justify-content:space-between;gap:10px;width:100%;padding:11px 10px;border-radius:8px;cursor:pointer;font-size:15px}
+.txs button:hover{background:#F6F6F4}
+.txs button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.txs button[aria-pressed="true"] .d{color:#C9CDD3}
+.txs .d{color:var(--muted);font-size:13px;display:block}
+.txs .m{font-weight:600}
+.pick .foot{font-size:13px;color:var(--muted);text-align:center;margin-top:8px}
+
+.run{min-width:0}
+.track{list-style:none;margin:0 0 24px;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.track li{border-top:4px solid var(--line);padding-top:10px;font-size:14px;color:var(--muted);transition:border-color .2s,color .2s}
+.track li b{display:block;color:inherit;font-weight:600;font-size:14px}
+.track li.done{border-color:var(--ink);color:var(--ink)}
+.track li.stop{border-color:var(--deny);color:var(--deny)}
+.track li.ask{border-color:var(--warn);color:var(--warn)}
+.track li.skip{border-color:var(--line);color:#A3A9B1;text-decoration:line-through}
+.log{display:grid;gap:12px}
+.step{background:var(--panel);border-radius:18px;padding:18px 22px}
+.step .h{font-weight:700;color:var(--ink);font-size:15px;margin-bottom:4px}
+.step p{font-size:15.5px}
+.step code{font-family:var(--sans);font-weight:600;background:#fff;border:1px solid var(--line);border-radius:6px;padding:0 6px;font-size:14px}
+.ask-card{background:#fff;border:2px solid var(--warn);border-radius:18px;padding:20px 22px}
+.ask-card .q{font-size:19px;color:var(--ink);font-weight:600;margin:4px 0 14px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts button{border:1.5px solid var(--ink);background:#fff;border-radius:999px;padding:8px 18px;cursor:pointer;font-weight:600}
+.opts button:hover{background:var(--ink);color:#fff}
+.verdict{border-radius:20px;padding:22px 24px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 18px;align-items:baseline}
+.verdict.ok{background:var(--ok-bg)} .verdict.deny{background:var(--deny-bg)} .verdict.warn{background:var(--warn-bg)}
+.verdict .big{font-size:34px;font-weight:800;grid-row:span 2}
+.verdict.ok .big{color:var(--ok)} .verdict.deny .big{color:var(--deny)} .verdict.warn .big{color:var(--warn)}
+.verdict .what{color:var(--ink);font-weight:600}
+.verdict .sub{font-size:15px}
+.law{background:#fff;border-left:4px solid var(--ink);border-radius:4px 14px 14px 4px;padding:16px 20px}
+.law .ref{font-family:var(--serif);font-weight:600;color:var(--ink);font-size:16px}
+.law .txt{font-family:var(--serif);font-size:16.5px;line-height:1.85;color:var(--ink2);margin-top:6px}
+.law .none{font-size:15px;color:var(--muted);margin-top:4px}
+.laws{display:grid;gap:10px}
+.again{margin-top:4px}
+.again button{background:none;border:0;padding:0;text-decoration:underline;cursor:pointer;color:var(--muted);font-size:15px}
+.note{font-size:14px;color:var(--muted);margin-top:28px;max-width:70ch}
+.live{margin-top:48px;border:1.5px solid var(--ink);border-radius:24px;padding:28px 30px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center}
+.live h3{font-size:24px}
+.live-actions{display:flex;gap:10px;flex-wrap:wrap}
+.live p{margin-top:6px}
+.media{margin:24px 0 0;max-width:880px;border:1.5px dashed #AEB4BC;border-radius:20px;aspect-ratio:16/9;display:grid;place-items:center;color:var(--muted);font-size:15px;background:var(--panel);overflow:hidden}
+.media video,.media img{width:100%;height:100%;object-fit:cover;display:block}
+.media[data-src=""]{aspect-ratio:auto;padding:28px;max-width:none}
+.media[data-src]:not([data-src=""]){border:0}
+
+/* structure */
+.structure{background:var(--panel)}
+.lanes{display:grid;gap:16px}
+.lane{background:#fff;border-radius:24px;padding:26px 28px}
+.lane .title{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;margin-bottom:18px}
+.lane h3{font-size:22px;font-weight:600}
+.lane .title span{color:var(--muted);font-size:15px}
+.flow{list-style:none;margin:0;padding:0;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:0}
+.flow li{position:relative;padding:14px 18px 14px 16px;background:var(--panel);border-radius:14px;margin-right:22px}
+.flow li:not(:last-child)::after{content:"";position:absolute;right:-17px;top:50%;width:12px;height:12px;border-top:2px solid var(--ink);border-right:2px solid var(--ink);transform:translateY(-50%) rotate(45deg)}
+.flow li b{display:block;color:var(--ink);font-size:15.5px}
+.flow li span{font-size:14px;color:var(--muted);display:block;margin-top:2px}
+.flow li.core{background:var(--ink);color:#fff}
+.flow li.core b{color:#fff} .flow li.core span{color:#C9CDD3}
+.flow li.later{background:#fff;border:1.5px dashed #AEB4BC}
+.decisions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+.dec{background:#fff;border-radius:22px;padding:26px 28px}
+.dec h3{font-size:21px;font-weight:600;margin-bottom:10px}
+.dec .why{margin-top:10px;padding-top:12px;border-top:1px solid var(--line);font-size:15.5px}
+.dec .why b{color:var(--ink)}
+
+/* progress */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:2px solid var(--ink);border-bottom:1px solid var(--line)}
+.stat{padding:26px 22px 26px 0}
+.stat:not(:first-child){padding-left:22px;border-left:1px solid var(--line)}
+.stat .v{font-size:clamp(34px,4vw,48px);color:var(--ink);font-weight:400;letter-spacing:-0.03em;line-height:1.1}
+.stat .l{font-size:15px;margin-top:8px}
+.done-list{margin-top:40px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 40px;padding:0;list-style:none}
+.done-list li{padding-left:26px;position:relative}
+.done-list li::before{content:"";position:absolute;left:0;top:.55em;width:12px;height:7px;border-left:2.5px solid var(--ok);border-bottom:2.5px solid var(--ok);transform:rotate(-45deg)}
+.timeline{list-style:none;margin:56px 0 0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;counter-reset:t}
+.timeline li{border-top:4px solid var(--line);padding-top:14px;font-size:15px}
+.timeline li.now{border-color:var(--signal)}
+.timeline li.goal{border-color:var(--ink)}
+.timeline .date{font-weight:700;color:var(--ink);font-size:17px}
+.next{margin-top:56px;background:var(--ink);color:#fff;border-radius:28px;padding:40px clamp(24px,4vw,48px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px;align-items:center}
+.next h3{color:#fff;font-size:clamp(26px,3vw,36px);line-height:1.35}
+.next p{color:#D5D9DE;margin-top:12px}
+.calc{background:#fff;color:var(--ink);border-radius:18px;padding:22px 24px;font-size:16px}
+.calc .row{display:flex;justify-content:space-between;gap:12px;padding:6px 0}
+.calc .row+.row{border-top:1px solid var(--line)}
+.calc .res{font-size:28px;font-weight:700}
+footer{padding:40px 0 64px;color:var(--muted);font-size:14px;border-top:1px solid var(--line)}
+
+@media (max-width:980px){
+  .hero .wrap,.demo-grid,.next,.persona,.decisions{grid-template-columns:minmax(0,1fr)}
+  .contrast{grid-template-columns:minmax(0,1fr)}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stat:nth-child(3){padding-left:0;border-left:0}
+  .stat:nth-child(n+3){border-top:1px solid var(--line)}
+  .timeline{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:24px}
+  .flow{grid-auto-flow:row;gap:22px}
+  .flow li{margin-right:0}
+  .flow li:not(:last-child)::after{right:auto;left:50%;top:auto;bottom:-15px;transform:translateX(-50%) rotate(135deg)}
+  .bar nav{display:none}
+  .bar .pill{margin-left:auto}
+  .live{grid-template-columns:minmax(0,1fr)}
+  .stage{min-height:0}
+}
+@media (max-width:620px){
+  section{padding:80px 0}
+  .track{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:14px}
+  .done-list{grid-template-columns:minmax(0,1fr)}
+  .timeline{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stats{grid-template-columns:minmax(0,1fr)}
+  .stat,.stat:not(:first-child){padding-left:0;border-left:0}
+  .stat+.stat{border-top:1px solid var(--line)}
+  .stage{padding:32px 18px 44px}
+  .stamp{right:4px}
+  .hint{display:none}
+  .verdict{grid-template-columns:minmax(0,1fr)}
+  .verdict .big{grid-row:auto}
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="#top"><i aria-hidden="true"></i>경비판정</a>
+    <nav aria-label="발표 순서">
+      <a href="#problem">문제</a>
+      <a href="#demo">직접 판정해 보기</a>
+      <a href="#structure">판정 구조</a>
+      <a href="#progress">진행 상황</a>
+    </nav>
+    <a class="pill js-live" href="#demo">실서버에서 써 보기</a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- 표지 -->
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap">
+    <div>
+      <h1 id="hero-title">이 카드값,<br>경비가 될까요?</h1>
+      <p class="lead">경비판정은 1인 사업자의 카드 결제를 한 건씩 판정합니다. 경비로 인정되는지와 그 근거가 되는 소득세법 조문을 함께 보여 주고, 애매하면 되묻습니다.</p>
+      <div class="actions">
+        <a class="pill" href="#demo">직접 판정해 보기</a>
+        <a class="pill light" href="#problem">왜 필요한가요</a>
+      </div>
+      <p class="hint">발표 중에는 <kbd>←</kbd> <kbd>→</kbd> 키로 다음 장으로 넘어갑니다.</p>
+    </div>
+    <div class="stage" aria-label="판정 예시: AWS 결제 48,200원은 경비로 인정됩니다">
+      <div class="receipt" aria-hidden="true">
+        <p class="shop">AMAZON WEB SERVICES</p>
+        <p class="meta num">2026.03.04 사업용 카드</p>
+        <hr>
+        <div class="lines">
+          <div class="row"><span>EC2 / S3 사용료</span><span class="num">48,200</span></div>
+          <div class="row" style="color:var(--muted);font-size:13px;margin-top:6px"><span>분류</span><span>해외 SaaS</span></div>
+          <div class="row" style="color:var(--muted);font-size:13px"><span>규칙 카드</span><span>R-940909100</span></div>
+          <div class="row" style="color:var(--muted);font-size:13px"><span>계정과목</span><span>지급수수료</span></div>
+        </div>
+        <hr>
+        <div class="row total"><span>합계</span><span class="num">48,200원</span></div>
+        <div class="stamp"><b>가능</b><small>소득세법 제27조 ①</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 1. 문제 -->
+<section class="problem" id="problem" aria-labelledby="problem-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="part">1. 문제</span>
+      <h2 id="problem-title">같은 커피값도<br>사람마다 답이 다릅니다</h2>
+      <p>경비 인정 여부는 지출 항목만으로 정해지지 않습니다. 업종, 매출 규모, 직원 유무, 그리고 그 지출을 어디에 썼는지에 따라 갈립니다.</p>
+    </div>
+
+    <div class="contrast">
+      <article class="case">
+        <h3>스타벅스 6,800원</h3>
+        <p class="who">1인 개발자, 평일 오후</p>
+        <ul>
+          <li><span>거래처와 미팅</span><span class="tag ok">가능</span></li>
+          <li><span>혼자 작업</span><span class="tag deny">불가</span></li>
+          <li><span>용도를 모름</span><span class="tag warn">확인 필요</span></li>
+        </ul>
+      </article>
+      <article class="case">
+        <h3>다이소 12,000원</h3>
+        <p class="who">생활용품 매장</p>
+        <ul>
+          <li><span>업무용 소모품</span><span class="tag ok">가능</span></li>
+          <li><span>집에서 쓸 물건</span><span class="tag deny">불가</span></li>
+          <li><span>둘 다 섞임</span><span class="tag warn">확인 필요</span></li>
+        </ul>
+      </article>
+      <article class="case">
+        <h3>주정차 과태료 4만 원</h3>
+        <p class="who">업무 중에 받았어도</p>
+        <ul>
+          <li><span>업무 이동 중</span><span class="tag deny">불가</span></li>
+          <li><span>개인 이동 중</span><span class="tag deny">불가</span></li>
+          <li><span>어떤 경우든</span><span class="tag deny">불가</span></li>
+        </ul>
+      </article>
+    </div>
+
+    <div class="persona">
+      <div class="box">
+        <h3>누구를 위한 서비스인가요</h3>
+        <ul>
+          <li>직원 없이 혼자 일하는 IT 개발 사업자 (국세청 업종코드 940909)</li>
+          <li>사업용 카드 1장과 개인 카드를 섞어 쓰고, 집을 작업실로 씀</li>
+          <li>매출이 기준을 넘어 장부로 실제 경비를 한 건씩 세야 함</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>경비판정이 하지 않는 일</h3>
+        <ul>
+          <li>세무사를 대신하지 않습니다. 맡기기 전에 자료와 질문 목록을 정리해 줍니다.</li>
+          <li>신고, 제출, 환급 대행을 하지 않습니다.</li>
+          <li>모든 판정은 사용자가 직접 뒤집을 수 있습니다.</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="quote">자기 기준을 확인할 방법이 없으니, 5월에 1년 치 카드내역을 놓고도 애매한 건은 그냥 빼고 넘어갑니다.</p>
+  </div>
+</section>
+
+<!-- 2. 시연 -->
+<section id="demo" aria-labelledby="demo-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="part">2. 직접 판정해 보기</span>
+      <h2 id="demo-title">결제 한 건을 골라<br>판정 과정을 따라가 보세요</h2>
+      <p>실제 서비스의 판정 엔진은 결제 한 건을 관문 여섯 개에 차례로 통과시킵니다. 아래 영수증에서 하나를 누르면 어느 관문에서 어떤 규칙 카드에 걸리는지, 근거 조문이 무엇인지 볼 수 있습니다.</p>
+    </div>
+
+    <div class="demo-grid">
+      <div class="pick">
+        <div class="receipt">
+          <p class="shop">3월 카드 승인내역</p>
+          <p class="meta">판정할 결제를 고르세요</p>
+          <hr>
+          <ul class="txs" id="txs"></ul>
+          <hr>
+          <p class="foot">체험용 예시 결제 6건</p>
+        </div>
+      </div>
+
+      <div class="run" aria-live="polite">
+        <ol class="track" id="track" aria-label="판정 관문"></ol>
+        <div class="log" id="log">
+          <div class="step"><p class="h">왼쪽에서 결제를 하나 고르세요</p><p>판정 엔진이 관문을 하나씩 지나가며 무엇을 봤는지 여기에 적습니다.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="note">체험용 예시 결제입니다. 규칙 카드 번호와 판정, 근거 조문, 되묻기 질문은 실제 서비스의 규칙 카드(rules/cards)와 같습니다. 조문 원문은 발췌이며, 서비스에서는 국가법령정보센터에서 받아 시행일별로 저장한 원문을 보여 줍니다.</p>
+
+    <div class="live">
+      <div>
+        <h3>내 카드내역으로 해 보기</h3>
+        <p id="live-text">실서버 링크는 발표 직전에 열립니다. 로그인 화면에서 아무 이메일과 안내받은 비밀번호로 들어가면, 테스트 카드내역(KB국민카드 1분기, 가짜 데이터)을 받아 올리면 업로드부터 판정, 되묻기, 요약까지 직접 써 볼 수 있습니다.</p>
+      </div>
+      <div class="live-actions">
+        <a class="pill light" href="media/demo_kb_2026Q1.xls" download>테스트 카드내역 받기</a>
+        <a class="pill js-live" href="#demo">실서버에서 써 보기</a>
+      </div>
+    </div>
+
+    <!-- 시연 영상: data-src 에 파일 경로를 넣으면 영상이 보입니다 (예: media/demo.mp4) -->
+    <figure class="media" data-src="" data-kind="video" aria-label="시연 영상">시연 영상이 들어갈 자리</figure>
+  </div>
+</section>
+
+<!-- 3. 구조 -->
+<section class="structure" id="structure" aria-labelledby="structure-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="part">3. 판정 구조와 설계 결정</span>
+      <h2 id="structure-title">AI가 규칙을 만들고,<br>규칙이 판정합니다</h2>
+      <p>판정 엔진 안에는 AI가 없습니다. 같은 결제는 언제 넣어도 같은 판정이 나와야 하기 때문입니다. AI는 판정 앞뒤에서 사람을 돕습니다.</p>
+    </div>
+
+    <div class="lanes">
+      <div class="lane">
+        <div class="title"><h3>판정 경로</h3><span>같은 입력이면 항상 같은 결과</span></div>
+        <ol class="flow">
+          <li><b>카드내역 읽기</b><span>브라우저에서 KB·IBK 파일을 읽고 취소 건을 상계</span></li>
+          <li><b>가맹점 분류</b><span>결제대행사 차단, 개인 사전, 전역 사전, 키워드 규칙 순서</span></li>
+          <li class="core"><b>규칙 엔진 6관문</b><span>규칙 카드에 맞춰 가능, 불가, 확인 필요</span></li>
+          <li><b>근거 조문</b><span>카드에 적힌 조문 번호로 시행일에 맞는 원문을 조회</span></li>
+        </ol>
+      </div>
+      <div class="lane">
+        <div class="title"><h3>AI가 하는 일</h3><span>판정을 대신하지 않고 사람을 돕는 자리</span></div>
+        <ol class="flow">
+          <li><b>판정 못 한 결제 모으기</b><span>맞는 규칙 카드가 없으면 판정 대신 후보로 쌓음</span></li>
+          <li><b>규칙 카드 초안</b><span>법령 원문을 검색해 조문 후보와 카드 초안을 만듦</span></li>
+          <li class="core"><b>사람이 승인</b><span>팀과 세무 검수를 거쳐야 규칙이 됨</span></li>
+          <li class="later"><b>분류 보조 모델</b><span>규칙으로 못 고른 가맹점의 카테고리 추천 (11월 연동)</span></li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="decisions">
+      <article class="dec">
+        <h3>판정 경로에 LLM을 넣지 않았습니다</h3>
+        <p>판정 함수 안에는 LLM 호출도, 외부 API 호출도, 현재 시각 조회도 없습니다.</p>
+        <p class="why"><b>이유</b> 세금 판정에서 같은 결제가 날마다 다르게 나오면 그건 결함입니다. 분류가 틀려도 규칙이 맞지 않아 확인 필요로 떨어질 뿐, 틀린 판정이 나가지 않습니다.</p>
+      </article>
+      <article class="dec">
+        <h3>근거가 없으면 판정하지 않습니다</h3>
+        <p>가능과 불가에는 반드시 조문이 붙습니다. 맞는 규칙 카드가 없으면 근거 칸을 비우고 확인 필요로 둡니다.</p>
+        <p class="why"><b>이유</b> 그럴듯한 근거를 지어내는 것보다 질문 하나를 더 하는 편이 사용자에게 덜 위험합니다.</p>
+      </article>
+      <article class="dec">
+        <h3>조문 번호는 카드에 고정하고 원문은 DB에서</h3>
+        <p>규칙 카드에 조문 번호를 적어 두고, 원문은 법령 API로 받은 시행판에서 판정일에 맞는 것을 꺼냅니다.</p>
+        <p class="why"><b>이유</b> 모델이 조문 번호를 직접 만들면 없는 조문이 나옵니다. 지난해 결제에는 지난해 시행판을 인용해야 합니다.</p>
+      </article>
+      <article class="dec">
+        <h3>사람이 승인해야 규칙이 됩니다</h3>
+        <p>사용자의 답변은 그 사용자 한 명에게만 적용됩니다. 전체 사용자에게 적용되는 규칙 카드는 검수를 거쳐 저장소에 들어갑니다.</p>
+        <p class="why"><b>이유</b> 답변 하나가 틀리면 그 사람 판정 한 건이 틀리지만, 규칙이 틀리면 모든 사용자의 판정이 틀립니다.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- 4. 진행 상황 -->
+<section id="progress" aria-labelledby="progress-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="part">4. 진행 상황과 다음 단계</span>
+      <h2 id="progress-title">업로드부터 요약까지<br>실데이터로 이어졌습니다</h2>
+      <p>카드내역을 올리면 분류, 문진, 판정, 되묻기, 직접 수정, 세무사 전달 요약까지 실제 서버와 DB로 동작합니다.</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><p class="v num">51장</p><p class="l">규칙 카드 (조문 근거 포함)</p></div>
+      <div class="stat"><p class="v num">58건 / 0건</p><p class="l">판정 평가셋 / 치명 오류</p></div>
+      <div class="stat"><p class="v num">83%</p><p class="l">실제 카드 338건 중 규칙만으로 가맹점 분류</p></div>
+      <div class="stat"><p class="v num">508개</p><p class="l">백엔드 자동 테스트 (단위 359, 통합 149)</p></div>
+    </div>
+
+    <ul class="done-list">
+      <li>카드사 파일(KB·IBK)을 브라우저에서 읽고 취소 건 상계</li>
+      <li>가맹점 정규화와 분류, 미분류 가맹점은 사용자에게 확인</li>
+      <li>6관문 판정 엔진과 판정 이력(재판정해도 지난 결과를 남김)</li>
+      <li>되묻기 답변을 반영한 부분 재판정</li>
+      <li>공휴일 판정(공공 API와 대체 데이터)과 지난 시행판 조문 인용</li>
+      <li>판정 직접 수정과 되돌리기, 세무사 전달 요약</li>
+    </ul>
+
+    <ol class="timeline" aria-label="남은 일정">
+      <li class="now"><p class="date num">10.23</p><p>수업 시연</p></li>
+      <li><p class="date num">10.26 – 10.30</p><p>실제 계정 로그인, 관리자 규칙 후보 화면, 금액 계산</p></li>
+      <li><p class="date num">11.02</p><p>분류 보조 모델 연동</p></li>
+      <li><p class="date num">11.03 – 11.05</p><p>회귀 점검과 시연 데이터</p></li>
+      <li><p class="date num">11.06</p><p>v1.0 배포</p></li>
+      <li class="goal"><p class="date num">11.13</p><p>최종 발표</p></li>
+    </ol>
+
+    <div class="next">
+      <div>
+        <h3>다음에 보여 드릴 장면: 350만 원짜리 맥북은 올해 얼마가 경비일까요?</h3>
+        <p>100만 원을 넘는 장비는 한 해에 전액이 아니라 자산으로 나눠 경비가 됩니다. 금액 계산을 붙이면 판정 화면에서 이 숫자까지 바로 보여 줍니다.</p>
+      </div>
+      <div class="calc" aria-label="맥북 감가상각 예시 계산">
+        <div class="row"><span>취득가</span><span class="num">3,500,000원</span></div>
+        <div class="row"><span>내용연수 5년, 정액법</span><span class="num">÷ 5</span></div>
+        <div class="row"><span>3월 취득, 올해 10개월</span><span class="num">× 10/12</span></div>
+        <div class="row"><span>올해 경비</span><span class="res num">583,333원</span></div>
+      </div>
+    </div>
+    <p class="note">예시 계산입니다. 실제 상각 방법과 내용연수는 신고 여부에 따라 달라서, 알 수 없으면 서비스는 금액을 확정하지 않고 확인 필요로 둡니다.</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">경비판정 · 카카오테크캠퍼스 4기 부산대 4팀 · 2026년 10월</div>
+</footer>
+
+<script>
+/* 실서버 주소: 발표 직전에 여기만 채우면 버튼이 열립니다 */
+const LIVE_URL = 'https://demo-ktc4-pusan-4.duckdns.org/';
+
+const LAW = {
+  '소득세법-27-1': { ref: '소득세법 제27조 제1항', text: '사업소득금액을 계산할 때 필요경비에 산입할 금액은 해당 과세기간의 총수입금액에 대응하는 비용으로서 일반적으로 용인되는 통상적인 것의 합계액으로 한다.' },
+  '소득세법-33-1-2': { ref: '소득세법 제33조 제1항 제2호', text: '벌금ㆍ과료(통고처분에 따른 벌금 또는 과료에 해당하는 금액을 포함한다)와 과태료' },
+  '소득세법-33-1-5': { ref: '소득세법 제33조 제1항 제5호', text: '가사(家事)의 경비와 이에 관련되는 경비로서 대통령령으로 정하는 것' },
+  '소득세법시행령-61-1-1': { ref: '소득세법 시행령 제61조 제1항 제1호', text: null, gist: '사업자가 가사와 관련해 지출한 것이 확인되는 금액은 가사 관련 경비로 봅니다.' },
+  '소득세법-35-1': { ref: '소득세법 제35조 제1항', text: null, gist: '업무상 접대에 쓴 비용(기업업무추진비)은 한도 안에서 경비가 됩니다. 한도는 1년 치를 모아 연말에 계산합니다.' },
+};
+
+const GATES = [
+  { k: 'in',  t: '입력 확인' },
+  { k: 'cls', t: '가맹점 분류' },
+  { k: 'g1',  t: 'G1 명백한 불산입' },
+  { k: 'g2',  t: 'G2 규칙 카드' },
+  { k: 'g36', t: 'G3~G6 속성' },
+  { k: 'out', t: '판정' },
+];
+
+const PRIVATE = ['소득세법-33-1-5', '소득세법시행령-61-1-1'];
+
+const TX = [
+  { id: 'aws', date: '03.04', shop: 'AMAZON WEB SERVICES', amount: 48200,
+    cls: { how: '키워드 규칙', cat: '해외SaaS' },
+    card: { id: 'R-940909100', name: '해외 SaaS (10만 원 이하)', verdict: '가능', account: '지급수수료', cites: ['소득세법-27-1'] } },
+  { id: 'cafe', date: '03.06', shop: '스타벅스 서면점', amount: 6800,
+    cls: { how: '전역 가맹점 사전', cat: '카페' },
+    card: { id: 'R-300', name: '카페', verdict: '확인필요', cites: PRIVATE,
+      ask: { text: '이 카페 결제는 어떤 용도였나요?', opts: [
+        { v: '업무 미팅', verdict: '가능', account: '접대비', cites: ['소득세법-35-1'], attr: 'G6 한도: 접대비 버킷에 담음' },
+        { v: '개인', verdict: '불가', cites: PRIVATE },
+        { v: '혼자 작업', verdict: '불가', cites: PRIVATE, why: '세무사 자문(2026.09)에 따라 혼자 쓴 카페 비용은 원칙적으로 개인 비용으로 봅니다.' },
+      ] } } },
+  { id: 'fine', date: '03.11', shop: '부산시 주정차위반 과태료', amount: 40000,
+    cls: { how: '키워드 규칙', cat: '지자체_과태료' },
+    card: { id: 'R-004', name: '과태료', gate: 'g1', verdict: '불가', cites: ['소득세법-33-1-2'] } },
+  { id: 'daiso', date: '03.14', shop: '다이소 부산대점', amount: 12000,
+    cls: { how: '전역 가맹점 사전', cat: '생활용품' },
+    card: { id: 'R-207', name: '생활용품', verdict: '불가', soft: true, cites: PRIVATE,
+      ask: { text: '이 건에서 구매한 물품은 업무용인가요?', opts: [
+        { v: '업무용', verdict: '가능', account: '소모품비', cites: ['소득세법-27-1'], attr: 'G5 증빙: 카드 전표로 확인' },
+        { v: '개인', verdict: '불가', cites: PRIVATE },
+        { v: '업무·개인 혼재', verdict: '확인필요', cites: [] },
+      ] } } },
+  { id: 'steam', date: '03.20', shop: 'STEAM PURCHASE', amount: 33000,
+    cls: { how: '키워드 규칙', cat: '게임' },
+    card: { id: 'R-306', name: '게임', verdict: '불가', cites: PRIVATE } },
+  { id: 'local', date: '03.27', shop: '성진이네', amount: 9000,
+    cls: { how: null, cat: null,
+      ask: { text: '「성진이네」는 어떤 곳인가요?', opts: [
+        { v: '카페', to: 'cafe' },
+        { v: '생활용품 가게', to: 'daiso' },
+        { v: '잘 모르겠어요', to: null },
+      ] } } },
+];
+
+const $ = (s) => document.querySelector(s);
+const won = (n) => n.toLocaleString('ko-KR') + '원';
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const wait = (ms) => new Promise((r) => setTimeout(r, reduce ? 0 : ms));
+let runId = 0;
+
+const list = $('#txs');
+TX.forEach((t) => {
+  const li = document.createElement('li');
+  li.innerHTML = `<button type="button" data-id="${t.id}" aria-pressed="false"><span><span class="m">${t.shop}</span><span class="d num">${t.date}</span></span><span class="num">${t.amount.toLocaleString('ko-KR')}</span></button>`;
+  list.append(li);
+});
+list.addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  list.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  run(TX.find((t) => t.id === b.dataset.id));
+});
+
+function track(state) {
+  $('#track').innerHTML = GATES.map((g) => `<li class="${state[g.k] || ''}"><b>${g.t}</b></li>`).join('');
+}
+track({});
+
+function add(html, cls = 'step') {
+  const d = document.createElement('div');
+  d.className = cls;
+  d.innerHTML = html;
+  $('#log').append(d);
+  return d;
+}
+
+function lawBlock(ids) {
+  if (!ids.length) {
+    return `<div class="law"><p class="ref">근거 조문 없음</p><p class="none">맞는 규칙이 없어 근거 칸을 비워 둡니다. 근거를 지어내지 않고 사용자와 세무사에게 넘깁니다.</p></div>`;
+  }
+  return ids.map((id) => {
+    const l = LAW[id];
+    return `<div class="law"><p class="ref">${l.ref}</p>${l.text ? `<p class="txt">${l.text}</p>` : `<p class="none">${l.gist}</p>`}</div>`;
+  }).join('');
+}
+
+const KIND = { '가능': 'ok', '불가': 'deny', '확인필요': 'warn' };
+const LABEL = { '가능': '가능', '불가': '불가', '확인필요': '확인 필요' };
+
+async function run(t, viaAnswer) {
+  const id = ++runId;
+  const alive = () => id === runId;
+  if (!viaAnswer) $('#log').innerHTML = '';
+  const st = {};
+  track(st);
+
+  st.in = 'done'; track(st);
+  if (!viaAnswer) add(`<p class="h">입력 확인</p><p><span class="num">${t.date}</span> ${t.shop} <span class="num">${won(t.amount)}</span>. 승인 거래이고 취소 건과 상계되지 않아 판정 대상입니다.</p>`);
+  await wait(450); if (!alive()) return;
+
+  // 가맹점 분류
+  if (!t.cls.cat) {
+    st.cls = 'ask'; track(st);
+    add(`<p class="h">가맹점 분류</p><p>결제대행사, 개인 사전, 전역 사전, 키워드 규칙 어디에도 맞지 않습니다. 동네 가게 이름은 검색해도 특정할 수 없어서 사용자에게 묻습니다.</p>`);
+    const card = add(`<p class="h" style="color:var(--warn)">분류 확인</p><p class="q">${t.cls.ask.text}</p><div class="opts">${t.cls.ask.opts.map((o, i) => `<button type="button" data-i="${i}">${o.v}</button>`).join('')}</div>`, 'ask-card');
+    card.querySelector('.opts').addEventListener('click', async (e) => {
+      const b = e.target.closest('button'); if (!b || card.dataset.done) return;
+      card.dataset.done = '1';
+      const o = t.cls.ask.opts[+b.dataset.i];
+      card.querySelector('.opts').outerHTML = o.to
+        ? `<p>답: <b>${o.v}</b>. 이 답은 개인 사전에 저장되어 다음 업로드부터 자동으로 분류됩니다.</p>`
+        : `<p>답: <b>${o.v}</b>. 카테고리를 정하지 않고 넘어갑니다.</p>`;
+      if (!o.to) { await unmatched(t); return; }
+      const base = TX.find((x) => x.id === o.to);
+      await run({ ...base, date: t.date, shop: t.shop, amount: t.amount, cls: { how: '사용자 답변', cat: base.cls.cat } }, true);
+    });
+    return;
+  }
+  st.cls = 'done'; track(st);
+  add(`<p class="h">가맹점 분류</p><p>${t.cls.how}로 <code>${t.cls.cat}</code> 카테고리를 찾았습니다.</p>`);
+  await wait(450); if (!alive()) return;
+
+  const c = t.card;
+  if (c.gate === 'g1') {
+    st.g1 = 'stop'; st.g2 = 'skip'; st.g36 = 'skip'; track(st);
+    add(`<p class="h">G1 명백한 불산입</p><p>규칙 카드 <code>${c.id} ${c.name}</code>에 걸렸습니다. 법이 명시적으로 경비에서 빼는 항목이라 여기서 판정을 끝냅니다. 업무 중에 받았어도 결과는 같습니다.</p>`);
+    await wait(350); if (!alive()) return;
+    return finish(st, c.verdict, c.cites, null, c.id);
+  }
+  st.g1 = 'done'; track(st);
+  add(`<p class="h">G1 명백한 불산입</p><p>벌금, 과태료, 세금처럼 무조건 빠지는 항목이 아닙니다. 다음 관문으로 넘어갑니다.</p>`);
+  await wait(450); if (!alive()) return;
+
+  if (c.ask) {
+    st.g2 = 'ask'; track(st);
+    const pre = c.soft
+      ? `기본 판정은 <b>불가</b>입니다. 다만 업무용이라고 소명하면 풀리는 불가라서 여기서 끝내지 않고 묻습니다.`
+      : `카페는 용도에 따라 결론이 갈려서 기본 판정을 <b>확인 필요</b>로 두고 사용자에게 묻습니다.`;
+    add(`<p class="h">G2 규칙 카드</p><p>규칙 카드 <code>${c.id} ${c.name}</code>와 맞습니다. ${pre}</p>`);
+    const card = add(`<p class="h" style="color:var(--warn)">되묻기</p><p class="q">${c.ask.text}</p><div class="opts">${c.ask.opts.map((o, i) => `<button type="button" data-i="${i}">${o.v}</button>`).join('')}</div>`, 'ask-card');
+    card.querySelector('.opts').addEventListener('click', async (e) => {
+      const b = e.target.closest('button'); if (!b || card.dataset.done) return;
+      card.dataset.done = '1';
+      const o = c.ask.opts[+b.dataset.i];
+      card.querySelector('.opts').outerHTML = `<p>답: <b>${o.v}</b>. 이 답을 사실로 저장하고, 같은 질문이 걸린 거래만 다시 판정합니다.</p>`;
+      const id2 = ++runId;
+      st.g2 = 'done'; track(st);
+      if (o.why) add(`<p class="h">답변 반영</p><p>${o.why}</p>`);
+      await wait(400); if (id2 !== runId) return;
+      if (o.verdict === '가능') {
+        st.g36 = 'done'; track(st);
+        add(`<p class="h">G3~G6 속성</p><p>안분, 자산화, 증빙, 한도는 판정을 끊지 않고 정보만 남깁니다. ${o.attr}.</p>`);
+        await wait(400); if (id2 !== runId) return;
+      } else {
+        st.g36 = 'skip'; track(st);
+      }
+      finish(st, o.verdict, o.cites, o.account, c.id);
+    });
+    return;
+  }
+
+  st.g2 = c.verdict === '불가' ? 'stop' : 'done'; track(st);
+  if (c.verdict === '불가') {
+    add(`<p class="h">G2 규칙 카드</p><p>규칙 카드 <code>${c.id} ${c.name}</code>와 맞고, 소명으로 풀 수 없는 불가라서 여기서 판정을 끝냅니다.</p>`);
+    st.g36 = 'skip'; track(st);
+    await wait(350); if (!alive()) return;
+    return finish(st, c.verdict, c.cites, null, c.id);
+  }
+  add(`<p class="h">G2 규칙 카드</p><p>규칙 카드 <code>${c.id} ${c.name}</code>와 맞습니다. 이 업종의 통상적인 비용으로 봅니다.</p>`);
+  await wait(450); if (!alive()) return;
+  st.g36 = 'done'; track(st);
+  add(`<p class="h">G3~G6 속성</p><p>안분, 자산화, 증빙, 한도는 판정을 끊지 않고 정보만 남깁니다. 10만 원 이하 소프트웨어 사용료라 자산이 아니고, 카드 전표가 증빙입니다.</p>`);
+  await wait(400); if (!alive()) return;
+  finish(st, c.verdict, c.cites, c.account, c.id);
+}
+
+async function unmatched(t) {
+  const st = { in: 'done', cls: 'done', g1: 'done', g2: 'ask', g36: 'skip' };
+  track(st);
+  add(`<p class="h">G2 규칙 카드</p><p>카테고리를 모르니 맞는 규칙 카드가 없습니다. 판정을 지어내지 않고 확인 필요로 둔 뒤, 이 결제를 새 규칙 카드 후보로 모읍니다.</p>`);
+  await wait(400);
+  finish(st, '확인필요', [], null, null);
+}
+
+function finish(st, verdict, cites, account, cardId) {
+  st.out = verdict === '가능' ? 'done' : verdict === '불가' ? 'stop' : 'ask';
+  track(st);
+  const k = KIND[verdict];
+  const what = verdict === '가능' ? `${account}로 경비 처리` : verdict === '불가' ? '필요경비에 넣지 않음' : '세무사에게 물어볼 목록에 담음';
+  add(`<span class="big">${LABEL[verdict]}</span><p class="what">${what}</p><p class="sub">${cardId ? `규칙 카드 ${cardId}` : '규칙 카드 없음'}. 판정 결과는 이력으로 남고, 사용자가 언제든 직접 바꿀 수 있습니다.</p>`, `verdict ${k}`);
+  add(lawBlock(cites), 'laws');
+  const again = add(`<button type="button">다른 결제 골라 보기</button>`, 'again');
+  again.querySelector('button').addEventListener('click', () => $('#demo').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }));
+}
+
+/* 실서버 링크 */
+document.querySelectorAll('.js-live').forEach((a) => {
+  if (LIVE_URL) { a.href = LIVE_URL; a.target = '_blank'; a.rel = 'noopener'; }
+  else if (a.closest('.live')) { a.setAttribute('aria-disabled', 'true'); a.textContent = '링크 준비 중'; a.addEventListener('click', (e) => e.preventDefault()); }
+});
+if (LIVE_URL) $('#live-text').textContent = '로그인 화면에서 아무 이메일과 비밀번호 demo1234@로 들어가면(실제 이메일은 쓰지 마세요), 테스트 카드내역(KB국민카드 1분기, 가짜 데이터)을 받아 올리면 업로드부터 판정, 되묻기, 요약까지 직접 써 볼 수 있습니다.';
+
+/* 미디어 자리 */
+document.querySelectorAll('.media').forEach((f) => {
+  const src = f.dataset.src;
+  if (!src) return;
+  f.textContent = '';
+  const el = document.createElement(f.dataset.kind === 'video' ? 'video' : 'img');
+  el.src = src;
+  if (el.tagName === 'VIDEO') { el.controls = true; el.playsInline = true; el.preload = 'metadata'; }
+  else el.alt = f.getAttribute('aria-label') || '';
+  f.append(el);
+});
+
+/* 발표용 키보드 이동 */
+const stops = ['#top', '#problem', '#demo', '#structure', '#progress'].map((s) => $(s));
+function current() {
+  const y = scrollY + 90;
+  let i = 0;
+  stops.forEach((el, k) => { if (el.offsetTop <= y) i = k; });
+  return i;
+}
+addEventListener('keydown', (e) => {
+  if (e.target.closest('input,textarea,select') || e.altKey || e.metaKey || e.ctrlKey) return;
+  let d = 0;
+  if (e.key === 'ArrowRight') d = 1;
+  if (e.key === 'ArrowLeft') d = -1;
+  if (!d) return;
+  e.preventDefault();
+  const n = Math.max(0, Math.min(stops.length - 1, current() + d));
+  window.scrollTo({ top: n === 0 ? 0 : stops[n].offsetTop - 64, behavior: reduce ? 'auto' : 'smooth' });
+});
+const navLinks = [...document.querySelectorAll('.bar nav a')];
+addEventListener('scroll', () => {
+  const i = current();
+  navLinks.forEach((a, k) => a.setAttribute('aria-current', String(k === i - 1)));
+}, { passive: true });
+</script>
+</body>
+</html>
