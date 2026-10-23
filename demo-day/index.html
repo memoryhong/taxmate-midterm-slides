@@ -159,6 +159,8 @@ kbd{font-family:var(--sans);font-size:13px;border:1px solid var(--line);border-b
 .media video,.media img{width:100%;height:100%;object-fit:cover;display:block}
 .media[data-src=""]{aspect-ratio:auto;padding:28px;max-width:none}
 .media[data-src]:not([data-src=""]){border:0}
+.media iframe{width:100%;height:100%;border:0;display:block}
+.media[data-kind="iframe"][data-src]:not([data-src=""]){max-width:none;border:1.5px solid var(--line);background:#fff}
 
 /* structure */
 .structure{background:var(--panel)}
@@ -402,9 +404,12 @@ footer{padding:40px 0 64px;color:var(--muted);font-size:14px;border-top:1px soli
       </div>
       <div class="live-actions">
         <a class="pill light" href="media/demo_kb_2026Q1.xls" download>테스트 카드내역 받기</a>
-        <a class="pill js-live" href="#demo">실서버에서 써 보기</a>
+        <a class="pill js-live" href="#demo">새 탭에서 열기</a>
       </div>
     </div>
+
+    <!-- 실서버 화면: LIVE_URL 이 있으면 스크립트가 data-src 에 넣어 바로 써 볼 수 있게 띄웁니다 -->
+    <figure class="media js-live-frame" data-src="" data-kind="iframe" aria-label="실서버 데모 화면">실서버 링크가 열리면 여기서 바로 써 볼 수 있습니다</figure>
 
     <!-- 시연 영상: data-src 에 파일 경로를 넣으면 영상이 보입니다 (예: media/demo.mp4) -->
     <figure class="media" data-src="" data-kind="video" aria-label="시연 영상">시연 영상이 들어갈 자리</figure>
@@ -745,16 +750,19 @@ document.querySelectorAll('.js-live').forEach((a) => {
   if (LIVE_URL) { a.href = LIVE_URL; a.target = '_blank'; a.rel = 'noopener'; }
   else if (a.closest('.live')) { a.setAttribute('aria-disabled', 'true'); a.textContent = '링크 준비 중'; a.addEventListener('click', (e) => e.preventDefault()); }
 });
-if (LIVE_URL) $('#live-text').textContent = '로그인 화면에서 아무 이메일과 비밀번호 demo1234@로 들어가면(실제 이메일은 쓰지 마세요), 테스트 카드내역(KB국민카드 1분기)을 받아 올리면 업로드부터 판정, 되묻기, 요약까지 직접 써 볼 수 있습니다.';
+if (LIVE_URL) $('#live-text').textContent = '테스트 카드내역(KB국민카드 1분기)을 받아 아래 화면에 올리면 업로드부터 판정, 되묻기, 요약까지 직접 써 볼 수 있습니다. 로그인 이메일은 미리 채워져 있으니 비밀번호 demo1234@만 넣으세요. 화면이 좁으면 새 탭으로 여세요.';
+if (LIVE_URL) document.querySelectorAll('.js-live-frame').forEach((f) => { f.dataset.src = LIVE_URL; });
 
 /* 미디어 자리 */
 document.querySelectorAll('.media').forEach((f) => {
   const src = f.dataset.src;
   if (!src) return;
   f.textContent = '';
-  const el = document.createElement(f.dataset.kind === 'video' ? 'video' : 'img');
+  const kind = f.dataset.kind;
+  const el = document.createElement(kind === 'video' ? 'video' : kind === 'iframe' ? 'iframe' : 'img');
   el.src = src;
   if (el.tagName === 'VIDEO') { el.controls = true; el.playsInline = true; el.preload = 'metadata'; }
+  else if (el.tagName === 'IFRAME') el.title = f.getAttribute('aria-label') || '';
   else el.alt = f.getAttribute('aria-label') || '';
   f.append(el);
 });
